@@ -60,7 +60,7 @@ namespace ScoutWarmup
                 {
                     AddTimer(45.0f, () => 
 					{ 
-						Server.PrintToChatAll($" {ChatColors.Red}[BR] {ChatColors.Default}Good Luck & Have Fun <3")
+						Server.PrintToChatAll($" {ChatColors.Red}[BR] {ChatColors.Default}Good Luck & Have Fun <3");
 						Server.ExecuteCommand("sv_autobunnyhopping false");
                 		Server.ExecuteCommand("sv_enablebunnyhopping false");
 						Server.ExecuteCommand("mp_warmup_end");
