@@ -3,7 +3,7 @@ using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Core.Attributes.Registration;
 using static CounterStrikeSharp.API.Core.Listeners;
 
-namespace ScoutWarmup;
+namespace ScoutWarmup
 {
 
 	public class ScoutWarmup : BasePlugin
