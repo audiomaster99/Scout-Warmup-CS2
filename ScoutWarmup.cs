@@ -58,10 +58,12 @@ namespace ScoutWarmup
 				WriteColor($"[SCOUTWARMUP] - Warmup Started - Scout+Bhop Enabled", ConsoleColor.Green);
 				Server.NextFrame(() =>
                 {
-                    AddTimer(60.0f, () => 
+                    AddTimer(45.0f, () => 
 					{ 
+						Server.PrintToChatAll($" {ChatColors.Red}[BR] {ChatColors.Default}Good Luck & Have Fun <3")
 						Server.ExecuteCommand("sv_autobunnyhopping false");
                 		Server.ExecuteCommand("sv_enablebunnyhopping false");
+						Server.ExecuteCommand("mp_warmup_end");
 						WriteColor($"[SCOUTWARMUP] - Warmup Ended - Scout+Bhop Disabled", ConsoleColor.Red);
 					 });
                 });
