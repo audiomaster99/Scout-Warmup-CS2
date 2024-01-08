@@ -75,7 +75,7 @@ namespace ScoutWarmup
 			CCSPlayerController player = @event.Userid;
 			if (WarmupPeriod)
 			{
-				if(player == null && !player.IsValid || player.Connected != PlayerConnectedState.PlayerConnected)
+				if (player == null && !player.IsValid || player.Connected != PlayerConnectedState.PlayerConnected || player.PlayerPawn.IsValid)
 				{
 					// Skip invalid players
 					return HookResult.Continue;
