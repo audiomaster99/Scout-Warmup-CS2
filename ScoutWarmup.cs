@@ -37,8 +37,8 @@ namespace ScoutWarmup
 
         public override void Load(bool hotReload)
         {
-            InitializeGameRules();
-            RegisterListener<OnMapStart>(OnMapStart);
+            OnMapStart(Server.MapName);
+			RegisterListener<OnMapStart>(OnMapStart);
         }
 
         private void OnMapStart(string mapName)
