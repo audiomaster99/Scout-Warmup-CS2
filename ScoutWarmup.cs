@@ -65,7 +65,9 @@ namespace ScoutWarmup
 				Server.ExecuteCommand("sv_autobunnyhopping true");
                 Server.ExecuteCommand("sv_enablebunnyhopping true");
 				WriteColor($"[SCOUTWARMUP] - Warmup Started - Scout+Bhop Enabled", ConsoleColor.Green);
+				return HookResult.Continue;
 			}
+			return HookResult.Continue;
 		}
 
 		[GameEventHandler]
@@ -76,7 +78,9 @@ namespace ScoutWarmup
 				Server.ExecuteCommand("sv_autobunnyhopping false");
                 Server.ExecuteCommand("sv_enablebunnyhopping false");
 				WriteColor($"[SCOUTWARMUP] - Warmup Ended - Scout+Bhop Disabled", ConsoleColor.Red);
+				return HookResult.Continue;
 			}
+			return HookResult.Continue;
 		}
 
 		static void WriteColor(string message, ConsoleColor color)
