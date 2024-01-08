@@ -72,23 +72,21 @@ namespace ScoutWarmup
 		[GameEventHandler]
         public HookResult OnClientSpawn(EventPlayerSpawn @event, GameEventInfo info)
         {
+			CCSPlayerController player = @event.Userid;
 			if (WarmupPeriod)
 			{
-				foreach (var player in Utilities.GetPlayers())
-                {
-                    if(player == null && !player.IsValid || player.Connected != PlayerConnectedState.PlayerConnected)
-                    {
-                        // Skip invalid players
-                        return HookResult.Continue;
-                    }
-					if (CheckIsHaveWeapon("ssg08", player) == false)
-					{
-						player.GiveNamedItem("weapon_ssg08");
-					}
-					if (CheckIsHaveWeapon("taser", player) == false)
-					{
-					player.GiveNamedItem("weapon_taser");
-					}
+				if(player == null && !player.IsValid || player.Connected != PlayerConnectedState.PlayerConnected)
+				{
+					// Skip invalid players
+					return HookResult.Continue;
+				}
+				if (CheckIsHaveWeapon("ssg08", player) == false)
+				{
+					player.GiveNamedItem("weapon_ssg08");
+				}
+				if (CheckIsHaveWeapon("taser", player) == false)
+				{
+				player.GiveNamedItem("weapon_taser");
 				}
 				return HookResult.Continue;
 			}
