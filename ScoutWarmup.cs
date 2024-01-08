@@ -75,13 +75,20 @@ namespace ScoutWarmup
 			CCSPlayerController player = @event.Userid;
 			if (WarmupPeriod)
 			{
-				if (player == null || !player.IsValid || player.Connected != PlayerConnectedState.PlayerConnected || player.PlayerPawn.IsValid)
+				if (player == null || !player.IsValid || player.Connected != PlayerConnectedState.PlayerConnected)
 				{
 					// Skip invalid players
 					return HookResult.Continue;
 				}
-				player.GiveNamedItem("weapon_ssg08");
+				if (CheckIsHaveWeapon("ssg08", player) == false)
+				{
+					player.GiveNamedItem("weapon_ssg08");
+				}
+				if (CheckIsHaveWeapon("taser", player) == false)
+				{
 				player.GiveNamedItem("weapon_taser");
+				}
+				return HookResult.Continue;
 			}
 			return HookResult.Continue;
 		}
