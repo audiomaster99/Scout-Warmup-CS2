@@ -53,6 +53,27 @@ namespace ScoutWarmup
         {
 			if (WarmupPeriod)
 			{
+				Server.ExecuteCommand("sv_autobunnyhopping true");
+                Server.ExecuteCommand("sv_enablebunnyhopping true");
+				WriteColor($"[SCOUTWARMUP] - Warmup Started - Scout+Bhop Enabled", ConsoleColor.Green);
+				Server.NextFrame(() =>
+                {
+                    AddTimer(60.0f, () => 
+					{ 
+						Server.ExecuteCommand("sv_autobunnyhopping false");
+                		Server.ExecuteCommand("sv_enablebunnyhopping false");
+						WriteColor($"[SCOUTWARMUP] - Warmup Ended - Scout+Bhop Disabled", ConsoleColor.Red);
+					 });
+                });
+				return HookResult.Continue;
+			}
+			return HookResult.Continue;
+		}
+		[GameEventHandler]
+        public HookResult OnClientSpawn(EventPlayerSpawn @event, GameEventInfo info)
+        {
+			if (WarmupPeriod)
+			{
 				foreach (var player in Utilities.GetPlayers())
                 {
                     if(player == null && !player.IsValid || player.Connected != PlayerConnectedState.PlayerConnected)
@@ -63,27 +84,10 @@ namespace ScoutWarmup
 					player.GiveNamedItem("weapon_ssg08");
 					player.GiveNamedItem("weapon_taser");
 				}
-				Server.ExecuteCommand("sv_autobunnyhopping true");
-                Server.ExecuteCommand("sv_enablebunnyhopping true");
-				WriteColor($"[SCOUTWARMUP] - Warmup Started - Scout+Bhop Enabled", ConsoleColor.Green);
 				return HookResult.Continue;
 			}
 			return HookResult.Continue;
 		}
-
-		[GameEventHandler]
-		public HookResult OnRoundEnd(EventRoundEnd @event, GameEventInfo info)
-		{  
-			if (WarmupPeriod)
-			{
-				Server.ExecuteCommand("sv_autobunnyhopping false");
-                Server.ExecuteCommand("sv_enablebunnyhopping false");
-				WriteColor($"[SCOUTWARMUP] - Warmup Ended - Scout+Bhop Disabled", ConsoleColor.Red);
-				return HookResult.Continue;
-			}
-			return HookResult.Continue;
-		}
-
 		static void WriteColor(string message, ConsoleColor color)
         {
             var pieces = Regex.Split(message, @"(\[[^\]]*\])");
