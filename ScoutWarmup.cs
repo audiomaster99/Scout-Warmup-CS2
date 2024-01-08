@@ -1,7 +1,8 @@
-﻿using CounterStrikeSharp.API;
+﻿using System;
+using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Core.Attributes.Registration;
-using static CounterStrikeSharp.API.Core.Listeners;
+using CounterStrikeSharp.API.Core.Listeners;
 using CounterStrikeSharp.API.Modules.Commands;
 using CounterStrikeSharp.API.Modules.Admin;
 using CounterStrikeSharp.API.Modules.Utils;
@@ -9,100 +10,102 @@ using CounterStrikeSharp.API.Modules.Menu;
 using CounterStrikeSharp.API.Core.Attributes;
 using CounterStrikeSharp.API.Modules.Timers;
 using System.Text.RegularExpressions;
-using System.ComponentModel;
-using System.Drawing;
 
 namespace ScoutWarmup
 {
+    public class ScoutWarmup : BasePlugin
+    {
+        public override string ModuleName => "Warmup Scout";
+        public override string ModuleVersion => "v.1";
+        public override string ModuleAuthor => "audio";
+        public override string ModuleDescription => "Enable Scout, Zeus, and Bhop during warmup";
 
-	public class ScoutWarmup : BasePlugin
-	{
-		public override string ModuleName => "Warmup Scout";
-		public override string ModuleVersion => "v.1";
-		public override string ModuleAuthor => "audio";
-		public override string ModuleDescription => "Scout + Zeus + Bhop in warmup";
+        private CCSGameRules? _gameRules = null;
 
-		CCSGameRules? _gameRules = null;   // ty Abner <3
-
-		public bool WarmupPeriod
-		{
-			get
-			{
-				if (_gameRules is null)
-					SetGameRules();
-
-				return _gameRules is not null && _gameRules.WarmupPeriod;
-			}
-		}
-		void SetGameRules() => _gameRules = Utilities.FindAllEntitiesByDesignerName<CCSGameRulesProxy>("cs_gamerules").First().GameRules!;
-
-		public override void Load(bool hotReload)
-		{
-			OnMapStart(Server.MapName);
-			RegisterListener<OnMapStart>(OnMapStart);
-		}
-
-		void OnMapStart(string _mapname)
+        public bool IsWarmup
         {
-            _gameRules = null;
-            AddTimer(1.0F, SetGameRules);
+            get
+            {
+                if (_gameRules is null)
+                    InitializeGameRules();
+
+                return _gameRules is not null && _gameRules.WarmupPeriod;
+            }
         }
 
-		[GameEventHandler]
-		public HookResult OnRoundStart(EventRoundStart @event, GameEventInfo info)
+        private void InitializeGameRules() => _gameRules = Utilities.FindAllEntitiesByDesignerName<CCSGameRulesProxy>("cs_gamerules").FirstOrDefault()?.GameRules;
+
+        public override void Load(bool hotReload)
         {
-			if (WarmupPeriod)
-			{
-				foreach (var player in Utilities.GetPlayers())
+            InitializeGameRules();
+            RegisterListener<OnMapStart>(OnMapStart);
+        }
+
+        private void OnMapStart(string mapName)
+        {
+            _gameRules = null;
+            AddTimer(1.0F, InitializeGameRules);
+        }
+
+        [GameEventHandler]
+        public HookResult OnRoundStart(EventRoundStart @event, GameEventInfo info)
+        {
+            if (IsWarmup)
+            {
+                foreach (var player in Utilities.GetPlayers())
                 {
-                    if(player == null && !player.IsValid || player.Connected != PlayerConnectedState.PlayerConnected)
+                    if (player == null || !player.IsValid || player.Connected != PlayerConnectedState.PlayerConnected)
                     {
                         // Skip invalid players
-                        return HookResult.Continue;
+                        continue;
                     }
-					player.GiveNamedItem("weapon_ssg08");
-					player.GiveNamedItem("weapon_taser");
-				}
-				Server.ExecuteCommand("sv_autobunnyhopping true");
+
+                    player.GiveNamedItem("weapon_ssg08");
+                    player.GiveNamedItem("weapon_taser");
+                }
+
+                Server.ExecuteCommand("sv_autobunnyhopping true");
                 Server.ExecuteCommand("sv_enablebunnyhopping true");
-				WriteColor($"[SCOUTWARMUP] - Warmup Started - Scout+Bhop Enabled", ConsoleColor.Green);
-				return HookResult.Continue;
-			}
-			return HookResult.Continue;
-		}
 
-		[GameEventHandler]
-		public HookResult OnRoundEnd(EventRoundEnd @event, GameEventInfo info)
-		{  
-			if (WarmupPeriod)
-			{
-				Server.ExecuteCommand("sv_autobunnyhopping false");
+                WriteColor("[SCOUTWARMUP] - Warmup Started - Scout+Bhop Enabled", ConsoleColor.Green);
+            }
+
+            return HookResult.Continue;
+        }
+
+        [GameEventHandler]
+        public HookResult OnRoundEnd(EventRoundEnd @event, GameEventInfo info)
+        {
+            if (IsWarmup)
+            {
+                Server.ExecuteCommand("sv_autobunnyhopping false");
                 Server.ExecuteCommand("sv_enablebunnyhopping false");
-				WriteColor($"[SCOUTWARMUP] - Warmup Ended - Scout+Bhop Disabled", ConsoleColor.Red);
-				return HookResult.Continue;
-			}
-			return HookResult.Continue;
-		}
 
-		static void WriteColor(string message, ConsoleColor color)
+                WriteColor("[SCOUTWARMUP] - Warmup Ended - Scout+Bhop Disabled", ConsoleColor.Red);
+            }
+
+            return HookResult.Continue;
+        }
+
+        private static void WriteColor(string message, ConsoleColor color)
         {
             var pieces = Regex.Split(message, @"(\[[^\]]*\])");
 
-            for (int i = 0; i < pieces.Length; i++)
+            foreach (var piece in pieces)
             {
-                string piece = pieces[i];
-
                 if (piece.StartsWith("[") && piece.EndsWith("]"))
                 {
                     Console.ForegroundColor = color;
-                    piece = piece.Substring(1, piece.Length - 2);
+                    Console.Write(piece.Substring(1, piece.Length - 2));
+                    Console.ResetColor();
                 }
-
-                Console.Write(piece);
-                Console.ResetColor();
+                else
+                {
+                    Console.Write(piece);
+                }
             }
 
             Console.WriteLine();
         }
-	}
+    }
 }
