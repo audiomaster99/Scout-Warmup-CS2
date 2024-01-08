@@ -62,8 +62,8 @@ namespace ScoutWarmup
 					player.GiveNamedItem("weapon_ssg08");
 					player.GiveNamedItem("weapon_taser");
 				}
-				change_cvar("sv_autobunnyhopping", "true");
-                change_cvar("sv_enablebunnyhopping", "true");
+				Server.ExecuteCommand("sv_autobunnyhopping true");
+                Server.ExecuteCommand("sv_enablebunnyhopping true");
 				WriteColor($"[SCOUTWARMUP] - Warmup Started - Scout+Bhop Enabled", ConsoleColor.Green);
 			}
 		}
@@ -73,8 +73,8 @@ namespace ScoutWarmup
 		{  
 			if (WarmupPeriod)
 			{
-				change_cvar("sv_autobunnyhopping", "false");
-                change_cvar("sv_enablebunnyhopping", "false");
+				Server.ExecuteCommand("sv_autobunnyhopping false");
+                Server.ExecuteCommand("sv_enablebunnyhopping false");
 				WriteColor($"[SCOUTWARMUP] - Warmup Ended - Scout+Bhop Disabled", ConsoleColor.Red);
 			}
 		}
