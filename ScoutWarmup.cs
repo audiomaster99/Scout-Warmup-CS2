@@ -81,12 +81,39 @@ namespace ScoutWarmup
                         // Skip invalid players
                         return HookResult.Continue;
                     }
-					player.GiveNamedItem("weapon_ssg08");
+					if (CheckIsHaveWeapon("ssg08", player) == false)
+					{
+						player.GiveNamedItem("weapon_ssg08");
+					}
+					if (CheckIsHaveWeapon("taser", player) == false)
+					{
 					player.GiveNamedItem("weapon_taser");
+					}
 				}
 				return HookResult.Continue;
 			}
 			return HookResult.Continue;
+		}
+		private bool CheckIsHaveWeapon(string weapon_name, CCSPlayerController? pc)
+		{
+			if (pc == null || !pc.IsValid )
+				return false;
+			var pawn = pc.PlayerPawn.Value.WeaponServices!;
+			if (pawn == null)
+				return false;
+			var client = pc.Index;
+			foreach (var weapon in pawn.MyWeapons)
+			{
+				if (weapon is { IsValid: true, Value.IsValid: true })
+				{
+					if (weapon.Value.DesignerName != null && weapon.Value.DesignerName.Contains($"{weapon_name}"))
+					{
+						return true;
+					}
+				}
+			}
+		
+			return false;
 		}
 		static void WriteColor(string message, ConsoleColor color)
         {
