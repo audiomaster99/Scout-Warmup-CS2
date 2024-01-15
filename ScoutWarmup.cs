@@ -56,6 +56,24 @@ namespace ScoutWarmup
 				Server.ExecuteCommand("sv_autobunnyhopping true");
                 Server.ExecuteCommand("sv_enablebunnyhopping true");
 				WriteColor($"[SCOUTWARMUP] - Warmup Started - Scout+Bhop Enabled", ConsoleColor.Green);
+				foreach (var l_player in Utilities.GetPlayers())
+				{
+					CCSPlayerController player = l_player;
+					var client = player.Index;
+					if (player == null || !player.IsValid || !player.PlayerPawn.IsValid || player.Connected != PlayerConnectedState.PlayerConnected)
+					{
+						return HookResult.Continue;
+					}
+					if (CheckIsHaveWeapon("ssg08", player) == false)
+					{
+						player.GiveNamedItem("weapon_ssg08");
+						WriteColor($"[[SCOUT WARMUP] - Giving [Scout] to [{player.PlayerName}]", ConsoleColor.Yellow);
+					}
+					if (CheckIsHaveWeapon("taser", player) == false)
+					{
+						player.GiveNamedItem("weapon_taser");
+					}
+				}
 				Server.NextFrame(() =>
                 {
                     AddTimer(45.0f, () => 
@@ -67,7 +85,6 @@ namespace ScoutWarmup
 						WriteColor($"[SCOUTWARMUP] - Warmup Ended - Scout+Bhop Disabled", ConsoleColor.Red);
 					 });
                 });
-				return HookResult.Continue;
 			}
 			return HookResult.Continue;
 		}
@@ -96,13 +113,18 @@ namespace ScoutWarmup
 		}
 		private bool CheckIsHaveWeapon(string weapon_name, CCSPlayerController? pc)
 		{
-			if (pc == null || !pc.IsValid )
+			if (pc == null)
 				return false;
-			var pawn = pc.PlayerPawn.Value.WeaponServices!;
-			if (pawn == null)
+
+			if (!pc.IsValid || player.Connected != PlayerConnectedState.PlayerConnected || pc.PlayerPawn == null || pc.PlayerPawn.Value == null)
 				return false;
+
+			var pawn = pc.PlayerPawn.Value;
+			if (pawn == null || pawn.WeaponServices == null)
+				return false;
+
 			var client = pc.Index;
-			foreach (var weapon in pawn.MyWeapons)
+			foreach (var weapon in pawn.WeaponServices.MyWeapons)
 			{
 				if (weapon is { IsValid: true, Value.IsValid: true })
 				{
@@ -112,7 +134,6 @@ namespace ScoutWarmup
 					}
 				}
 			}
-		
 			return false;
 		}
 		static void WriteColor(string message, ConsoleColor color)
